@@ -1,0 +1,14 @@
+{
+  "name": "cuby_website",
+  "version": "1.0.0",
+  "description": "Website to control Cuby",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tinus Scheppers",
+  "license": "ISC",
+  "dependencies": {
+    "nipplejs": "^0.8.5"
+  }
+}
