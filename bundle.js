@@ -45,9 +45,16 @@ nipple.on('move', (evt, data) => {
     // @ts-ignore
     var distance = Math.round(data.distance).toString().padStart(3, '0');
 
+    const buffer = new ArrayBuffer(8);
+    const view = new Uint32Array(buffer);
+
+    view[0] = degrees;
+    view[1] = distance;
+
     if (ws && ws.readyState === WebSocket.OPEN) {
         console.log(`degree: ${degrees}, distance: ${distance}`);
-        ws.send(`${degrees}${distance}`);
+        // ws.send(`${degrees}${distance}`);
+        ws.send(buffer);
     } 
 })
 },{"nipplejs":2}],2:[function(require,module,exports){
