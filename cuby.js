@@ -9,10 +9,17 @@ var nipple = require('nipplejs').create({
 // Setup WebSocket
 var ws;
 function connect() {
+    console.log('(re)connecting Socket!');
+
     ws = new WebSocket('ws://cuby');
-    
+
+    ws.onopen = function (e) {
+        console.log('Socket is (re)connected!');
+    };
+
     ws.onclose = function (e) {
         console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
+        ws = null;
         setTimeout(function () {
             connect();
         }, 1000);
@@ -21,7 +28,10 @@ function connect() {
     ws.onerror = function (err) {
         // @ts-ignore
         console.error('Socket encountered error: ', err.message, 'Closing socket');
-        ws.close();
+        ws = null;
+        setTimeout(function () {
+            connect();
+        }, 1000);
     };
 }
 
@@ -34,7 +44,8 @@ nipple.on('move', (evt, data) => {
     // @ts-ignore
     var distance = Math.round(data.distance).toString().padStart(3, '0');
 
-    console.log(`degree: ${degrees}, distance: ${distance}`);
-
-    ws.send(`${degrees}${distance}`);
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        console.log(`degree: ${degrees}, distance: ${distance}`);
+        ws.send(`${degrees}${distance}`);
+    } 
 })
