@@ -10,5 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "nipplejs": "^0.8.5"
+  },
+  "devDependencies": {
+    "tinyify": "^2.5.2"
   }
 }

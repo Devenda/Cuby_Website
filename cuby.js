@@ -1,7 +1,9 @@
 // Setup joystick
 var nipple = require('nipplejs').create({
     zone: document.getElementById('control'),
-    mode: 'static',
+    size: 200, // Max force is 100 at size 200
+    threshold: 0.4, // 40% starts moving motors, before that they just buzz
+    mode: 'static', // Fixed one
     position: { left: '50%', top: '50%' },
     color: 'red'
 });
@@ -11,7 +13,7 @@ var ws;
 function connect() {
     console.log('(re)connecting Socket!');
 
-    ws = new WebSocket('ws://cuby');
+    ws = new WebSocket('ws://cuby/ws');
 
     ws.onopen = function (e) {
         console.log('Socket is (re)connected!');
@@ -45,14 +47,27 @@ nipple.on('move', (evt, data) => {
     var distance = Math.round(data.distance).toString().padStart(3, '0');
 
     const buffer = new ArrayBuffer(8);
-    const view = new Uint32Array(buffer);
+    const array = new Uint32Array(buffer);
 
-    view[0] = degrees;
-    view[1] = distance;
-
-    if (ws && ws.readyState === WebSocket.OPEN) {
+    array[0] = degrees;
+    array[1] = distance;
+    
+    if (ws && ws.readyState === WebSocket.OPEN) {        
         console.log(`degree: ${degrees}, distance: ${distance}`);
-        // ws.send(`${degrees}${distance}`);
+        ws.send(buffer);
+    } 
+})
+
+// When releasing joystick
+nipple.on('end', (evt, data) => {
+    const buffer = new ArrayBuffer(8);
+    const array = new Uint32Array(buffer);
+
+    array[0] = 0;
+    array[1] = 0;
+    
+    if (ws && ws.readyState === WebSocket.OPEN) {        
+        console.log(`degree: 000, distance: 000`);
         ws.send(buffer);
     } 
 })
